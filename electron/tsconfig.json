@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "strict": true,
+        "module": "CommonJS",
+        "baseUrl": "..",
+        "paths": {
+            "*": [
+                "node_modules/*"
+            ]
+        },
+        "outDir": "../build"
+    },
+    "include": [
+        "src/**/*"
+    ]
+}

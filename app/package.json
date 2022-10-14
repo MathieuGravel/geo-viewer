@@ -1,0 +1,31 @@
+{
+	"name": "electron-svelte_application",
+	"author": "Mathieu Gavel",
+	"version": "0.0.1",
+	"scripts": {
+		"build": "rollup -c"
+	},
+	"dependencies": {
+		"leaflet": "^1.8.0"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "next",
+		"@sveltejs/adapter-static": "next",
+		"@sveltejs/kit": "next",
+		"svelte-check": "^2.7.1",
+		"svelte-preprocess": "^4.10.6",
+
+		"@rollup/plugin-commonjs": "20.0.0",
+		"@rollup/plugin-node-resolve": "13.0.4",
+		"@rollup/plugin-typescript": "8.2.5",
+		"@tsconfig/svelte": "2.0.1",
+		"rollup": "2.56.2",
+		"rollup-plugin-svelte": "7.1.0",
+		"rollup-plugin-copy": "^3.4.0",
+		"svelte": "^3.44.0",
+		"node-sass": "^7.0.1",
+		"tslib": "^2.3.1",
+		"typescript": "^4.7.2"
+	},
+	"type": "module"
+}

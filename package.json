@@ -1,0 +1,16 @@
+{
+    "name": "electron-svelte",
+    "version": "0.0.1",
+    "workspaces": [
+        "app",
+        "electron"
+    ],
+    "main": "build/index.js",
+    "scripts": {
+        "build": "npm run build -ws",
+        "start": "npm run build && electron .",
+        "run": "electron .",
+        "check": "npm run check -w=app",
+        "package": "npm run build && electron-packager . electron-svelte --electronVersion=19.0.6 --overwrite"
+    }
+}
