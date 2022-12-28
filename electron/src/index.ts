@@ -1,10 +1,11 @@
 import { app, BrowserWindow } from "electron";
+import serve from "electron-serve";
 import * as path from "path";
 
 
 const IS_DEVELOPMENT = !app.isPackaged;
 
-const INDEX_HTML: string = path.join(__dirname, "index.html");
+const loadURL = serve({directory: path.join(__dirname, "www")});
 
 async function createWindow() {
     const window = new BrowserWindow({
@@ -13,7 +14,7 @@ async function createWindow() {
         width: 800,
     });
 
-    window.loadFile(INDEX_HTML).catch(console.error);
+    loadURL(window)
 
     if (IS_DEVELOPMENT) window.webContents.openDevTools();
 }
