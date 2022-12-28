@@ -15,7 +15,6 @@ const config = {
 
 	preprocess: [
 		preprocess({
-			postcss: true,
 			typescript: true,
 			sass: true
 		}),

@@ -1,5 +1,10 @@
 <script>
-import Map from "$lib/Map.svelte";
+    import Map from "$lib/Map.svelte";
+    import TopMenu from "$lib/TopMenu.svelte";
 </script>
 
-<Map></Map>
+<TopMenu class="top-menu"/>
+
+<Map latitude="54.549"
+     longitude="-67.070"
+     zoom="4.65"/>

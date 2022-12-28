@@ -6,6 +6,10 @@
 </svelte:head>
 
 <script lang="js">
+    export let latitude = 0;
+    export let longitude = 0;
+    export let zoom = 5;
+
     import { onMount } from "svelte";
 
     onMount(async () => {
@@ -13,10 +17,9 @@
 
         const map = leaflet.map("map", {
             zoomControl: false
-        }).setView([54.549, -67.070], 4.65);
+        }).setView([latitude, longitude], zoom);
 
         leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
             attribution: "Open Street Map",
             tileSize: 256
         }).addTo(map);

@@ -14,7 +14,7 @@ async function createWindow() {
         width: 800,
     });
 
-    loadURL(window)
+    loadURL(window).catch(console.error)
 
     if (IS_DEVELOPMENT) window.webContents.openDevTools();
 }
