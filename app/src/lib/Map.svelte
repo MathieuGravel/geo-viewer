@@ -5,12 +5,12 @@
           crossorigin=""/>
 </svelte:head>
 
-<script lang="js">
+<script lang="ts">
+    import { onMount } from "svelte";
+
     export let latitude = 0;
     export let longitude = 0;
     export let zoom = 5;
-
-    import { onMount } from "svelte";
 
     onMount(async () => {
         const leaflet = (await import("leaflet"));
@@ -23,8 +23,14 @@
             attribution: "Open Street Map",
             tileSize: 256
         }).addTo(map);
-    });
 
+        map.on("contextmenu", e => {
+            const {lat, lng} = e.latlng;
+            const marker = new leaflet.Marker([lat, lng]);
+            marker.addTo(map);
+            console.log("You clicked the map at latitude: " + lat + " and longitude: " + lng);
+        })
+    });
 </script>
 
 <div id="map"></div>
