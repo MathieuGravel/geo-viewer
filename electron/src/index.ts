@@ -1,22 +1,27 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import serve from "electron-serve";
 import * as path from "path";
 
 
-const IS_DEVELOPMENT = !app.isPackaged;
+const IS_DEVELOPMENT = !app.isPackaged || true;
 
-const loadURL = serve({directory: path.join(__dirname, "www")});
+const loadURL = serve({directory: path.join(app.getAppPath(), "build", "www")});
 
 async function createWindow() {
     const window = new BrowserWindow({
         autoHideMenuBar: true,
         height: 600,
         width: 800,
+        webPreferences: {
+            preload: path.join(app.getAppPath(), "build", "preload.js")
+        }
     });
 
     loadURL(window).catch(console.error)
 
     if (IS_DEVELOPMENT) window.webContents.openDevTools();
+
+    // console.log(__dirname, app.getAppPath());
 }
 
 app.once("ready", () => {
@@ -37,3 +42,8 @@ app.on("window-all-closed", () => {
         app.quit();
     }
 });
+
+ipcMain.handle("import_file", async (e, args) => {
+    console.log(args);
+    return await dialog.showOpenDialog({ properties: ["openFile"] });
+})

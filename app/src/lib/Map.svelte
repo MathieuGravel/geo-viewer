@@ -5,17 +5,22 @@
           crossorigin=""/>
 </svelte:head>
 
-<script lang="ts">
-    import { onMount } from "svelte";
+<script lang="js">
+    import {onMount} from "svelte";
 
     export let latitude = 0;
     export let longitude = 0;
     export let zoom = 5;
 
-    onMount(async () => {
-        const leaflet = (await import("leaflet"));
+    let leaflet;
+    let map;
+    let polylinePath;
+    let redoCmdHistory = [];
 
-        const map = leaflet.map("map", {
+    onMount(async () => {
+        leaflet = await import("leaflet");
+
+        map = leaflet.map("map", {
             zoomControl: false
         }).setView([latitude, longitude], zoom);
 
@@ -24,13 +29,35 @@
             tileSize: 256
         }).addTo(map);
 
-        map.on("contextmenu", e => {
-            const {lat, lng} = e.latlng;
-            const marker = new leaflet.Marker([lat, lng]);
-            marker.addTo(map);
-            console.log("You clicked the map at latitude: " + lat + " and longitude: " + lng);
-        })
+        polylinePath = leaflet.polyline([], { color: "red" });
+        polylinePath.addTo(map);
+
+        map.on("contextmenu", e => addPoint(e.latlng));
     });
+
+    export function addPoint(latlng) {
+        polylinePath.addLatLng(latlng);
+        redoCmdHistory = [];
+    }
+
+    export function clear() {
+        const latlngs = polylinePath.getLatLngs();
+        redoCmdHistory.push(() => polylinePath.setLatLngs(latlngs))
+        polylinePath.setLatLngs([]);
+    }
+
+    export function undo() {
+        let latlngs = polylinePath.getLatLngs();
+        if (latlngs.length === 0) return;
+        let latlng = latlngs.pop();
+        redoCmdHistory.push(() => polylinePath.addLatLng(latlng))
+        polylinePath.setLatLngs(latlngs);
+    }
+
+    export function redo() {
+        redoCmdHistory.pop()?.call();
+    }
+
 </script>
 
 <div id="map"></div>
