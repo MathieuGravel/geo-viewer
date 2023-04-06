@@ -10,7 +10,9 @@
     let leaflet;
     let editLayerIdx;
     let layers = [];
+    let hiddenLayers = [];
     let distance = 0;
+    let isOtherLayerVisible = true;
 
     let mapMounted;
     onMount(async () => {
@@ -37,6 +39,19 @@
                 l.setLatLngs(lls);
                 distance = calculate_distance();
                 return () => addPoint(removedLL);
+            });
+        }
+    }
+
+    function setPoints(lls) {
+        const l = layers[editLayerIdx];
+        if (l instanceof leaflet.Polyline) {
+            l.setLatLngs(lls);
+            distance = calculate_distance()
+            undoCmdHistory.push(() => {
+                l.setLatLngs([]);
+                distance = calculate_distance();
+                return () => setPoints(lls);
             });
         }
     }
@@ -83,7 +98,6 @@
 
     async function exportCurrentLayer() {
         const l = layers[editLayerIdx];
-        let distance = 0;
         if (leaflet && l instanceof leaflet.Polyline) {
             const lls = l.getLatLngs();
             await window.ipcApi.exportFile({
@@ -91,6 +105,61 @@
                 "coordinates": lls.map(({lat, lng}) => [lng, lat])
             });
         }
+    }
+
+    async function importLayer() {
+        const l = layers[editLayerIdx];
+        const geojson = await window.ipcApi.importFile();
+        if (geojson === undefined) return;
+        if (isLayerTypeMatchGeoJsonType(l, geojson) && isLayerEmpty(l)) {
+            importInCurrentLayer(geojson);
+        } else {
+            importInNewLayer(geojson);
+        }
+    }
+
+    function importInCurrentLayer(geojson) {
+        const l = layers[editLayerIdx];
+        if (geojson.type === "LineString") {
+            const lls = geojson.coordinates.map(([lng, lat]) => ({ lat, lng }));
+            setPoints(lls);
+        }
+    }
+
+    function importInNewLayer(geojson) {
+        const l = leaflet.geoJSON(geojson);
+        layers.push(l);
+        l.addTo(map);
+    }
+
+    function isLayerTypeMatchGeoJsonType(layer, geojson) {
+        if (geojson.type === "LineString") {
+            return layer instanceof leaflet.Polyline;
+        }
+        return false;
+    }
+
+    function isLayerEmpty(layer) {
+        if (layer instanceof leaflet.Polyline) {
+            return layer.getLatLngs().length === 0;
+        }
+        return false;
+    }
+
+    function showOtherLayers() {
+        let l;
+        while (l = hiddenLayers.pop()) {
+           l.addTo(map);
+        }
+    }
+
+    function hideOtherLayers() {
+       for (let i = 0; i < layers.length; i++) {
+            if (i === editLayerIdx) continue;
+            const l = layers[i];
+            l.removeFrom(map);
+            hiddenLayers.push(l);
+       }
     }
 
     $: distanceValue = distance;
@@ -101,36 +170,23 @@
     }
     $: distanceValue = Math.round(distanceValue);
 
-
-
-    let map_;
-
-
-    async function onExport() {
-        const points = map_?.getPoints();
-        const geojson = {
-            "type": "LineString",
-            "coordinates": points.map(({lat, lng}) => [lng, lat])
-        }
-        await window.ipcApi.exportFile(geojson);
-    }
-
-    async function onImport() {
-        const geojson = await window.ipcApi.importFile();
-        map_?.addGeoJsonLayer(geojson);
+    $: if (isOtherLayerVisible) {
+        showOtherLayers();
+    } else {
+        hideOtherLayers();
     }
 
 </script>
 
 <TopMenu class="top-menu"
+         bind:isVisible={isOtherLayerVisible}
          onUndo={undo}
          onRedo={redo}
          onDelete={clear}
-         onImport={onImport}
+         onImport={importLayer}
          onExport={exportCurrentLayer}/>
 
-<Map bind:this={map_}
-     bind:mounted={mapMounted}
+<Map bind:mounted={mapMounted}
      bind:map={map}
      bind:leaflet={leaflet}
      onRightClick={e => addNewPoint(e.latlng)}
