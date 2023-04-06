@@ -1,7 +1,7 @@
+import * as fs from "fs";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import serve from "electron-serve";
 import * as path from "path";
-
 
 const IS_DEVELOPMENT = !app.isPackaged || true;
 
@@ -15,6 +15,7 @@ async function createWindow() {
         webPreferences: {
             preload: path.join(app.getAppPath(), "build", "preload.js")
         }
+
     });
 
     loadURL(window).catch(console.error)
@@ -43,7 +44,26 @@ app.on("window-all-closed", () => {
     }
 });
 
+ipcMain.handle("export_file", async (e, [geojson]) => {
+    const dialogResponse = await dialog.showSaveDialog({
+        filters: [
+            { name: "GeoJson", extensions: ["geojson"] },
+            { name: "Json", extensions: ["json"] }
+        ],
+    });
+    const path = dialogResponse.filePath;
+    if (dialogResponse.canceled || path === undefined) return;
+    fs.writeFileSync(path, JSON.stringify(geojson, null, 4));
+});
+
 ipcMain.handle("import_file", async (e, args) => {
-    console.log(args);
-    return await dialog.showOpenDialog({ properties: ["openFile"] });
-})
+    const dialogResponse = await dialog.showOpenDialog({
+        filters: [
+            { name: "GeoJson", extensions: ["geojson"] },
+            { name: "Json", extensions: ["json"] }
+        ]
+    });
+    const path = dialogResponse.filePaths[0];
+    if (dialogResponse.canceled || path === undefined) return;
+    return JSON.parse(fs.readFileSync(path).toString())
+});

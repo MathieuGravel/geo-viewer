@@ -8,16 +8,17 @@
 <script lang="js">
     import {onMount} from "svelte";
 
+    export let distance = 0;
     export let latitude = 0;
     export let longitude = 0;
     export let zoom = 5;
+    export let onRightClick = _ => {};
 
-    let leaflet;
-    let map;
-    let polylinePath;
-    let redoCmdHistory = [];
+    export let leaflet;
+    export let map;
+    export let mounted;
 
-    onMount(async () => {
+    const mount = async () => {
         leaflet = await import("leaflet");
 
         map = leaflet.map("map", {
@@ -26,38 +27,19 @@
 
         leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: "Open Street Map",
-            tileSize: 256
+            tileSize: 256,
+            maxZoom: 18
         }).addTo(map);
 
-        polylinePath = leaflet.polyline([], { color: "red" });
-        polylinePath.addTo(map);
+        map.on("contextmenu", e => onRightClick(e));
+    }
 
-        map.on("contextmenu", e => addPoint(e.latlng));
+    onMount(() => {
+        mounted = mount()
     });
-
-    export function addPoint(latlng) {
-        polylinePath.addLatLng(latlng);
-        redoCmdHistory = [];
+    export function addGeoJsonLayer(geojson) {
+        leaflet.geoJSON(geojson).addTo(map);
     }
-
-    export function clear() {
-        const latlngs = polylinePath.getLatLngs();
-        redoCmdHistory.push(() => polylinePath.setLatLngs(latlngs))
-        polylinePath.setLatLngs([]);
-    }
-
-    export function undo() {
-        let latlngs = polylinePath.getLatLngs();
-        if (latlngs.length === 0) return;
-        let latlng = latlngs.pop();
-        redoCmdHistory.push(() => polylinePath.addLatLng(latlng))
-        polylinePath.setLatLngs(latlngs);
-    }
-
-    export function redo() {
-        redoCmdHistory.pop()?.call();
-    }
-
 </script>
 
 <div id="map"></div>

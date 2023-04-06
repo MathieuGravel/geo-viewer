@@ -9,7 +9,7 @@ const config = {
 			assets: "../build/www",
 			fallback: null,
 			precompress: false,
-			strict: true
+			strict: false
 		}),
 	},
 

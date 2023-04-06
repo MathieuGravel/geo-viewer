@@ -8,8 +8,5 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
-	"type": "module",
-	"dependencies": {
-		"leaflet": "^1.9.3"
-	}
+	"type": "module"
 }

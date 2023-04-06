@@ -1,5 +1,4 @@
 <script lang="ts">
-    import settingIcon from "$lib/images/setting-icon.svg"
     import undoIcon from "$lib/images/undo-icon.svg"
     import redoIcon from "$lib/images/redo-icon.svg"
     import deleteIcon from "$lib/images/delete-icon.svg"
@@ -14,22 +13,34 @@
 
 </script>
 
-<div id="menu">
-   <a href="setting" ><img src="{settingIcon}" alt="Setting"/></a>
-   <img src="{undoIcon}" alt="Undo" on:click={() => onUndo?.call(undefined)} />
-   <img src="{redoIcon}" alt="Redo" on:click={() => onRedo?.call(undefined)} />
-   <img src="{deleteIcon}" alt="Delete" on:click={() => onDelete?.call(undefined)} />
-   <img src="{importIcon}" alt="Import" on:click={() => onImport?.call(undefined)} />
-   <img src="{exportIcon}" alt="Import" onclick={() => onExport?.call(undefined)} />
+<div id="top_menu">
+    <img src="{undoIcon}" alt="Undo" on:click={() => onUndo?.call(undefined)} />
+    <img src="{redoIcon}" alt="Redo" on:click={() => onRedo?.call(undefined)} />
+    <img src="{deleteIcon}" alt="Delete" on:click={() => onDelete?.call(undefined)} />
+    <img src="{importIcon}" alt="Import" on:click={() => onImport?.call(undefined)} />
+    <img src="{exportIcon}" alt="Import" on:click={() => onExport?.call(undefined)} />
 </div>
 
 <style lang="scss">
-    #menu {
-       display: flex;
-       position: absolute;
-       top: 0;
-       left: 0;
-       right: 0;
-       z-index: 1000;
+    #top_menu {
+        display: flex;
+        position: absolute;
+        background-color: white;
+        border-radius: 10px;
+        top: 10px;
+        left: 50%;
+        z-index: 1000;
+        height: 42px;
+        gap: 3px;
+        transform: translateX(-50%);
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+        img {
+            &:hover {
+                border-radius: 10px;
+                background-color: rgba(0, 0, 0, 0.075);
+            }
+        }
     }
+
 </style>
