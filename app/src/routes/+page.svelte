@@ -200,16 +200,6 @@
 </div>
 
 <style lang="scss">
-    a#setting {
-        position: absolute;
-        bottom: 5px;
-        left: 5px;
-        z-index: 1000;
-
-        img {
-            height: 42px;
-        }
-    }
     .distance {
         border-radius: 5px;
         background-color: white;
@@ -227,4 +217,5 @@
         align-items: center;
         gap: 5px
     }
+
 </style>
